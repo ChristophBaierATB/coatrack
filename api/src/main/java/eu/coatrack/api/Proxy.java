@@ -55,6 +55,8 @@ public class Proxy {
 
     private String configServerPassword;
 
+    private String sensitiveHeaders;
+
     @OneToOne
     private User owner;
 
@@ -82,8 +84,6 @@ public class Proxy {
     public void setConfigServerPassword(String credential_password) {
         this.configServerPassword = credential_password;
     }
-    
-    
 
     public User getOwner() {
         return owner;
@@ -155,6 +155,14 @@ public class Proxy {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public String getSensitiveHeaders() {
+        return sensitiveHeaders;
+    }
+
+    public void setSensitiveHeaders(String sensitiveHeaders) {
+        this.sensitiveHeaders = sensitiveHeaders;
     }
 
     @Override

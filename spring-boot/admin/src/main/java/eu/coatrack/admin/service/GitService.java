@@ -20,26 +20,19 @@ package eu.coatrack.admin.service;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.util.UUID;
 import eu.coatrack.api.Proxy;
 import eu.coatrack.api.ServiceApi;
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CommitCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.RmCommand;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.util.UUID;
 
 /**
  *
@@ -114,6 +107,9 @@ public class GitService {
         }
         writer.println("zuul.host.connect-timeout-millis: 150000");
         writer.println("zuul.host.socket-timeout-millis: 150000");
+        if (proxy.getSensitiveHeaders() != null) {
+            writer.println("zuul.sensitiveHeaders:" + proxy.getSensitiveHeaders());
+        }
         writer.close();
 
         AddCommand addCommand = git.add();

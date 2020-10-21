@@ -43,10 +43,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 import eu.coatrack.admin.logic.CreateProxyAction;
 import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.api.User;
@@ -179,6 +177,10 @@ public class AdminProxiesController {
         proxyStored.setPublicUrl(proxy.getPublicUrl());
         proxyStored.setPort(proxy.getPort());
 
+        List<String> selectedSensitiveHeaders = new ArrayList<>();
+        selectedSensitiveHeaders.add("Cookie");
+        selectedSensitiveHeaders.add("Set-Cookie");
+
         proxyStored.setServiceApis(new HashSet<>());
 
         if (selectedServices != null) {
@@ -187,6 +189,12 @@ public class AdminProxiesController {
                     .map(idString -> new Long(idString))
                     .map(id -> serviceApiRepository.findOne(id))
                     .forEach(service -> proxyStored.getServiceApis().add(service));
+        }
+
+        String sensitiveHeadersConfig = "";
+        if (selectedSensitiveHeaders != null){
+            selectedSensitiveHeaders.forEach(sensitiveHeader -> sensitiveHeadersConfig.concat(sensitiveHeader + ';'));
+            proxyStored.setSensitiveHeaders(sensitiveHeadersConfig);
         }
         proxyRepository.save(proxyStored);
 
