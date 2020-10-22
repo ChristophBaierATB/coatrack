@@ -58,7 +58,6 @@ public class GitService {
     private String adminApiBaseUrlForGateway;
 
     public void init() throws IOException, GitAPIException {
-        
 
         String tmpDirStr = System.getProperty("java.io.tmpdir");
         if (tmpDirStr == null) {
@@ -108,7 +107,7 @@ public class GitService {
         writer.println("zuul.host.connect-timeout-millis: 150000");
         writer.println("zuul.host.socket-timeout-millis: 150000");
         if (proxy.getSensitiveHeaders() != null) {
-            writer.println("zuul.sensitiveHeaders:" + proxy.getSensitiveHeaders());
+            writer.println("zuul.sensitiveHeaders:" + " " + proxy.getSensitiveHeaders());
         }
         writer.close();
 

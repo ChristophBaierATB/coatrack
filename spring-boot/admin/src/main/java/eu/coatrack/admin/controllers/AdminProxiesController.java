@@ -20,17 +20,22 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
+import eu.coatrack.admin.logic.CreateProxyAction;
 import eu.coatrack.admin.model.repository.MetricsAggregationCustomRepository;
 import eu.coatrack.admin.model.repository.ProxyRepository;
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
+import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.GitService;
 import eu.coatrack.admin.util.CustomProxyFileGenerator;
 import eu.coatrack.api.ApiKey;
 import eu.coatrack.api.Proxy;
+import eu.coatrack.api.User;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -45,14 +50,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import eu.coatrack.admin.logic.CreateProxyAction;
-import eu.coatrack.admin.model.repository.UserRepository;
-import eu.coatrack.api.User;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * @author Timon Veenstra <tveenstra@bebr.nl>
@@ -168,7 +166,7 @@ public class AdminProxiesController {
 
     @PostMapping(value = "/update")
     public ModelAndView updateProxy(@ModelAttribute Proxy proxy,
-            @RequestParam(required = false) List<String> selectedServices) throws IOException, GitAPIException, URISyntaxException, Exception {
+            @RequestParam(required = false) List<String> selectedServices, @RequestParam(required = false) List<String> selectedSensitiveHeaders) throws IOException, GitAPIException, URISyntaxException, Exception {
         log.debug("Update proxy: " + proxy.toString());
 
         Proxy proxyStored = proxyRepository.findOne(proxy.getId());
@@ -176,10 +174,6 @@ public class AdminProxiesController {
         proxyStored.setName(proxy.getName());
         proxyStored.setPublicUrl(proxy.getPublicUrl());
         proxyStored.setPort(proxy.getPort());
-
-        List<String> selectedSensitiveHeaders = new ArrayList<>();
-        selectedSensitiveHeaders.add("Cookie");
-        selectedSensitiveHeaders.add("Set-Cookie");
 
         proxyStored.setServiceApis(new HashSet<>());
 
@@ -192,8 +186,10 @@ public class AdminProxiesController {
         }
 
         String sensitiveHeadersConfig = "";
-        if (selectedSensitiveHeaders != null){
-            selectedSensitiveHeaders.forEach(sensitiveHeader -> sensitiveHeadersConfig.concat(sensitiveHeader + ';'));
+        if (selectedSensitiveHeaders != null) {
+            for (String selectedSensitiveHeader : selectedSensitiveHeaders) {
+                sensitiveHeadersConfig = sensitiveHeadersConfig.concat(selectedSensitiveHeader + ";");
+            }
             proxyStored.setSensitiveHeaders(sensitiveHeadersConfig);
         }
         proxyRepository.save(proxyStored);
