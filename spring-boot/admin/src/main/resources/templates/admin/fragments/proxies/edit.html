@@ -78,6 +78,25 @@
                                                    class="form-control col-md-7 col-xs-12"/>
                                         </div>
                                     </div>
+
+                                   <div class="form-group">
+                                      <label class="control-label col-md-3 col-sm-3 col-xs-12">
+                                           <br> Forwarding
+                                            Sensitive Headers</br>
+                                            <small>
+                                                By default, the Coatrack Gateway doesn't forward these headers.
+                                                Please activate if you need it.
+                                            </small>
+                                        </label>
+                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                            <span class="form-group">
+                                                <br> <input type="checkbox" name="selectedSensitiveHeaders" value="cookie"/> <span>Cookie</span></br>
+                                                 <input type="checkbox" name="selectedSensitiveHeaders" value="set_cookie"/> <span>Set Cookie</span>
+                                                <br> <input type="checkbox" name="selectedSensitiveHeaders" value="authorization"/> <span>Authorization</span></br>
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12"
                                                th:text="#{admin.proxies.edit.form.label.services}">
