@@ -85,6 +85,22 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-3 col-sm-3 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h3>Calls per service</h3>
+                            <p th:text="#{admin.dashboard.stats.calls.per.service.desc}">Description</p>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div style="width: 80%; height: 80%; margin-left: 10%;">
+                                <canvas class="canvasDoughnut" id="callsPerServiceChartCanvas" height="200" width="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
