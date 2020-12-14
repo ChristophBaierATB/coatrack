@@ -246,12 +246,13 @@
                 }
 
                 smartWizard = $('#wizard').smartWizard(
-                        {
-                            autoAdjustHeight: true,
-                            keyNavigation: false,
-                            onShowStep: onShowStepEvent,
-                            onFinish: onFinishCallback
-                        }
+                    {
+                        autoAdjustHeight: true,
+                        keyNavigation: false,
+                        onLeaveStep: leaveAStepCallback,
+                        onShowStep: onShowStepEvent,
+                        onFinish: onFinishCallback,
+                    }
                 );
 
                 $('.buttonNext').addClass('btn btn-success');
@@ -260,86 +261,118 @@
 
             }
 
-            function onShowStepEvent(obj, context)
+            function leaveAStepCallback(obj, context)
             {
-                    $("#serviceNameSummary").html($("#serviceName").val());
-                    $("#serviceUrlSummary").html($("#serviceUrl").val());
-
-                    if ($("#monthlyChargeInput").val() == "true")
-                    {
-                        $("#costMethod").html("Monthly charge")
-                    }
-
-                    if ($("#monthlyChargeInput").val() == "true")
-                    {
-                        $("#costMethod").html("Pay per month, " + $("#serviceCost").val() + " € per month")
-                    }
-
-                    if ($("#percallChargeInput").val() == "true")
-                    {
-                        $("#costMethod").html("Pay per number of calls, " + $("#serviceCost").val() + " € per 1000 calls")
-                    }
-
-                    if ($("#serviceForFree").val() == "true")
-                    {
-                        $("#costMethod").html("Service For Free")
-                    }
-                return true;
-
+                if (context.toStep > context.fromStep)
+                    return validateSteps(context.fromStep);
+                else
+                    return true;
             }
 
-            function onFinishCallback(objs, context) {
+            function validateSteps(stepnumber)
+            {
+                //Step 1 and 5 don't need any validation.
+                var isStepTwoValid = validateServiceName(stepnumber);
+                var isStepThreeValid = validateURL(stepnumber);
+                var isStepFourValid = validateServiceCharge(stepnumber);
 
-                if ($("#serviceName").val().trim() == "")
+                return isStepTwoValid && isStepThreeValid && isStepFourValid;
+            }
+
+            function validateServiceName(stepnumber)
+            {
+                if(stepnumber > 1 && $("#serviceName").val().trim() == "")
                 {
                     alert("You must fill service name");
+                    return false;
                 }
-                if ($("#serviceUrl").val().trim() == "")
-                {
-                    alert("You must fill service url");
-                }
+                return true;
+            }
 
-                if (!isValidURL($("#serviceUrl").val().trim()))
-                {
-                    alert("Service URL must be valid and start with http:// or https://");
+            function validateURL(stepnumber)
+            {
+                if(stepnumber > 2){
+                    if ($("#serviceUrl").val().trim() == "")
+                    {
+                        alert("You must fill service url");
+                        return false
+                    } else if (!isValidURL($("#serviceUrl").val().trim()))
+                    {
+                        alert("Service URL must be valid and start with http:// or https://");
+                        return false;
+                    }
                 }
+                return true;
+            }
 
-                if ($("#serviceForFree").val() == "")
+            function validateServiceCharge(stepnumber)
+            {
+                if (stepnumber > 3)
                 {
-                    alert("You must select either free service or not");
-                } else
+                    if($("#serviceForFree").val() == "")
+                    {
+                        alert("You must select either free service or not");
+                        return false;
+                    } else
+                    {
+                        return isChargeSetCorrectly();
+                    }
+                }
+                return true;
+            }
+
+            function isChargeSetCorrectly()
+            {
+                if ($("#serviceForFree").val() == "false")
                 {
-                    if ($("#serviceForFree").val() == "false" && $("#monthlyChargeInput").val() == "")
+                    if($("#monthlyChargeInput").val() == "")
                     {
                         alert("You must select either monthly charge or charge per call");
+                        return false;
                     }
-
-                    if ($("#serviceForFree").val() == "false" && $("#serviceCost").val() == "")
+                    else if ($("#serviceCost").val() == "")
                     {
                         alert("You must set up a cost for your service");
+                        return false;
                     }
                 }
+                return true;
+            }
 
-                if ($("#serviceName").val().trim() != "" && $("#serviceUrl").val().trim() && isValidURL($("#serviceUrl").val().trim()))
+            function onShowStepEvent()
+            {
+                $("#serviceNameSummary").html($("#serviceName").val());
+
+                $("#serviceUrlSummary").html($("#serviceUrl").val());
+
+                if ($("#monthlyChargeInput").val() == "true")
                 {
-                    if ($("#serviceForFree").val() !== "")
-                    {
-                        if ($("#serviceForFree").val() == "true")
-                        {
-                            $("#wizardForm").submit();
-                            $('#wizard').hide();
-                            $('#busy_indicator').show();
-                        } else
-                        {
-                            if ($("#monthlyChargeInput").val() !== "" && $("#serviceCost").val() !== "")
-                            {
-                                $("#wizardForm").submit();
-                                $('#wizard').hide();
-                                $('#busy_indicator').show();
-                            }
-                        }
-                    }
+                    $("#costMethod").html("Monthly charge")
+                }
 
+                if ($("#monthlyChargeInput").val() == "true")
+                {
+                    $("#costMethod").html("Pay per month, " + $("#serviceCost").val() + " € per month")
+                }
+
+                if ($("#percallChargeInput").val() == "true")
+                {
+                    $("#costMethod").html("Pay per number of calls, " + $("#serviceCost").val() + " € per 1000 calls")
+                }
+
+                if ($("#serviceForFree").val() == "true")
+                {
+                    $("#costMethod").html("Service For Free")
+                }
+
+                return true;
+            }
+
+            function onFinishCallback(obj, context) {
+                if (validateSteps(context.fromStep)){
+                    $("#wizardForm").submit();
+                    $('#wizard').hide();
+                    $('#busy_indicator').show();
                 }
             }
             /*]]>*/

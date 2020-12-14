@@ -8,6 +8,9 @@ ygg.mail.sender.user: @@ygg.mail.sender.user@@
 ygg.mail.sender.password: @@ygg.mail.sender.password@@
 ygg.mail.verification.server.url: http://localhost:8080
 
+ygg.mail.server.url: http://localhost
+ygg.mail.server.port: 8080
+
 logging:
   level:
     org.springframework.security: DEBUG
